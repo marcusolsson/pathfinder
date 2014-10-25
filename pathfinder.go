@@ -8,10 +8,10 @@ import (
 // TransitEdge is a direct transportation between two locations.
 type TransitEdge struct {
 	VoyageNumber string    `json:"voyage"`
-	FromUNLocode string    `json:"origin"`
-	ToUNLocode   string    `json:"destination"`
-	FromTime     time.Time `json:"departure"`
-	ToTime       time.Time `json:"arrival"`
+	Origin       string    `json:"origin"`
+	Destination  string    `json:"destination"`
+	Departure    time.Time `json:"departure"`
+	Arrival      time.Time `json:"arrival"`
 }
 
 // TransitPath is a series of transit edges.
@@ -54,10 +54,10 @@ func appendEdge(edges []TransitEdge, curr, next string, date time.Time) ([]Trans
 
 	edges = append(edges, TransitEdge{
 		VoyageNumber: randVoyageNumber(),
-		FromUNLocode: curr,
-		ToUNLocode:   next,
-		FromTime:     from,
-		ToTime:       to,
+		Origin:       curr,
+		Destination:  next,
+		Departure:    from,
+		Arrival:      to,
 	})
 
 	return edges, nextDate(to)
