@@ -4,6 +4,7 @@ import (
 	"math/rand"
 	"net/http"
 	"os"
+	"sync"
 	"time"
 
 	"github.com/gorilla/mux"
@@ -26,29 +27,57 @@ type TransitPath struct {
 
 // FindShortestPath computes the shortest paths between two locations.
 func FindShortestPath(origin, destination string) []TransitPath {
-	start := time.Now()
-	date := nextDate(start)
 
-	v := allVertices(origin, destination)
+	var candidates []TransitPath
 
-	candidates := make([]TransitPath, 3+rand.Intn(3))
-	for i := range candidates {
-		v = randChunk(v)
-
-		var edges []TransitEdge
-
-		edges, date = appendEdge(edges, origin, v[0], date)
-
-		for j := 0; j < len(v)-1; j++ {
-			edges, date = appendEdge(edges, v[j], v[j+1], date)
-		}
-
-		edges, _ = appendEdge(edges, v[len(v)-1], destination, date)
-
-		candidates[i] = TransitPath{Edges: edges}
+	for p := range generateCandidates(origin, destination, 3+rand.Intn(3)) {
+		candidates = append(candidates, p)
 	}
 
 	return candidates
+}
+
+// generateCandidates generates new candidates and pushes them into a channel.
+// Finding each candidate is potentially time-consuming, so we compute them in
+// parallel.
+func generateCandidates(origin, destination string, n int) chan TransitPath {
+	ch := make(chan TransitPath)
+
+	var wg sync.WaitGroup
+	wg.Add(n)
+
+	for i := 0; i < n; i++ {
+		go func() {
+			ch <- findCandidate(origin, destination, nextDate(time.Now()))
+			wg.Done()
+		}()
+	}
+
+	go func() {
+		wg.Wait()
+		close(ch)
+	}()
+
+	return ch
+}
+
+// findCandidate finds a random path between two locations starting from a
+// given time.
+func findCandidate(origin, destination string, start time.Time) TransitPath {
+	v := allVertices(origin, destination)
+	v = randChunk(v)
+
+	var edges []TransitEdge
+
+	edges, start = appendEdge(edges, origin, v[0], start)
+
+	for j := 0; j < len(v)-1; j++ {
+		edges, start = appendEdge(edges, v[j], v[j+1], start)
+	}
+
+	edges, _ = appendEdge(edges, v[len(v)-1], destination, start)
+
+	return TransitPath{Edges: edges}
 }
 
 func appendEdge(edges []TransitEdge, curr, next string, date time.Time) ([]TransitEdge, time.Time) {
@@ -118,7 +147,6 @@ func nextDate(t time.Time) time.Time {
 }
 
 func main() {
-
 	r := render.New(render.Options{IndentJSON: true})
 	router := mux.NewRouter()
 
