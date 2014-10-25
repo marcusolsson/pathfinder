@@ -1,8 +1,13 @@
-package pathfinder
+package main
 
 import (
 	"math/rand"
+	"net/http"
+	"os"
 	"time"
+
+	"github.com/gorilla/mux"
+	"gopkg.in/unrolled/render.v1"
 )
 
 // TransitEdge is a direct transportation between two locations.
@@ -110,4 +115,26 @@ func randChunk(locations []string) []string {
 func nextDate(t time.Time) time.Time {
 	n := time.Duration(rand.Intn(1000) - 500)
 	return t.Add(24 * time.Hour).Add(n * time.Minute)
+}
+
+func main() {
+
+	r := render.New(render.Options{IndentJSON: true})
+	router := mux.NewRouter()
+
+	router.HandleFunc("/paths", func(w http.ResponseWriter, req *http.Request) {
+		from := req.URL.Query().Get("from")
+		to := req.URL.Query().Get("to")
+
+		if len(from) == 0 || len(to) == 0 {
+			r.JSON(w, http.StatusBadRequest, map[string]interface{}{"error": "missing parameters"})
+			return
+		}
+
+		r.JSON(w, http.StatusOK, FindShortestPath(from, to))
+	}).Methods("GET")
+
+	http.Handle("/", router)
+
+	http.ListenAndServe(":"+os.Getenv("PORT"), nil)
 }
