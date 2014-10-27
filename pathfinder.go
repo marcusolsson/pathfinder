@@ -128,7 +128,8 @@ func randVoyageNumber() string {
 }
 
 func randChunk(locations []string) []string {
-	// TODO: Shuffle the locations first for even more randomness.
+
+	shuffle(locations)
 
 	t := len(locations)
 
@@ -142,6 +143,15 @@ func randChunk(locations []string) []string {
 	return locations[:c]
 }
 
+func shuffle(slc []string) {
+	for i := 1; i < len(slc); i++ {
+		r := rand.Intn(i + 1)
+		if i != r {
+			slc[r], slc[i] = slc[i], slc[r]
+		}
+	}
+}
+
 func nextDate(t time.Time) time.Time {
 	n := time.Duration(rand.Intn(1000) - 500)
 	return t.Add(24 * time.Hour).Add(n * time.Minute)
@@ -152,6 +162,8 @@ var port int
 func main() {
 	flag.IntVar(&port, "port", 8080, "the server port")
 	flag.Parse()
+
+	rand.Seed(time.Now().UnixNano())
 
 	r := render.New(render.Options{IndentJSON: true})
 	router := mux.NewRouter()
