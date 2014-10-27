@@ -1,4 +1,4 @@
-pathfinder [![wercker status](https://app.wercker.com/status/e2cf7e5e72cb1eb6ea30cb2e07ac0ea0 "wercker status")](https://app.wercker.com/project/bykey/e2cf7e5e72cb1eb6ea30cb2e07ac0ea0)
+pathfinder [![wercker status](https://app.wercker.com/status/b8863587e0a6ae46fe3c508732392e09/s "wercker status")](https://app.wercker.com/project/bykey/b8863587e0a6ae46fe3c508732392e09)
 ==========
 
 The routing context from the original DDD Sample Application, written in Go.
