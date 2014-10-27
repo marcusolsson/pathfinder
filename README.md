@@ -14,3 +14,7 @@ Returns an array of candidate paths for a given route.
 |:----------|:------------|
 |from=[string]|UN locode of the origin|
 |to=[string]|UN locode of the destination|
+
+## Copyright
+
+Copyright © 2014 Marcus Olsson. See [LICENSE](LICENSE) for details.
