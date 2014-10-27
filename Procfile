@@ -1,1 +1,1 @@
-web: pathfinder
+web: pathfinder -port $PORT

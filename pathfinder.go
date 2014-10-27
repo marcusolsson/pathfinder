@@ -1,9 +1,10 @@
 package main
 
 import (
+	"flag"
 	"math/rand"
 	"net/http"
-	"os"
+	"strconv"
 	"sync"
 	"time"
 
@@ -146,7 +147,12 @@ func nextDate(t time.Time) time.Time {
 	return t.Add(24 * time.Hour).Add(n * time.Minute)
 }
 
+var port int
+
 func main() {
+	flag.IntVar(&port, "port", 8080, "the server port")
+	flag.Parse()
+
 	r := render.New(render.Options{IndentJSON: true})
 	router := mux.NewRouter()
 
@@ -164,5 +170,5 @@ func main() {
 
 	http.Handle("/", router)
 
-	http.ListenAndServe(":"+os.Getenv("PORT"), nil)
+	http.ListenAndServe(":"+strconv.Itoa(port), nil)
 }
