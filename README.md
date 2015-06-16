@@ -1,5 +1,8 @@
-pathfinder [![wercker status](https://app.wercker.com/status/b8863587e0a6ae46fe3c508732392e09/s "wercker status")](https://app.wercker.com/project/bykey/b8863587e0a6ae46fe3c508732392e09)
+pathfinder 
 ==========
+
+[![wercker status](https://app.wercker.com/status/b8863587e0a6ae46fe3c508732392e09/s "wercker status")](https://app.wercker.com/project/bykey/b8863587e0a6ae46fe3c508732392e09)
+[![License MIT](https://img.shields.io/badge/license-MIT-lightgrey.svg?style=flat)](LICENSE)
 
 The routing context from the original DDD Sample Application, written in Go.
 
@@ -14,7 +17,3 @@ Returns an array of candidate paths for a given route.
 |:----------|:------------|
 |from=[string]|UN locode of the origin|
 |to=[string]|UN locode of the destination|
-
-## Copyright
-
-Copyright © 2014 Marcus Olsson. See [LICENSE](LICENSE) for details.
