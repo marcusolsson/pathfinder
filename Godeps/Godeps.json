@@ -1,21 +1,31 @@
 {
 	"ImportPath": "github.com/marcusolsson/pathfinder",
-	"GoVersion": "go1.3.3",
-	"Packages": [
-		"./..."
-	],
+	"GoVersion": "go1.5",
 	"Deps": [
 		{
-			"ImportPath": "github.com/gorilla/context",
-			"Rev": "14f550f51af52180c2eefed15e5fd18d63c0a64a"
+			"ImportPath": "github.com/go-kit/kit/endpoint",
+			"Rev": "069a0f8cf7ee45345296db0b153a0b9c7decb6b3"
 		},
 		{
-			"ImportPath": "github.com/gorilla/mux",
-			"Rev": "e444e69cbd2e2e3e0749a2f3c717cec491552bbf"
+			"ImportPath": "github.com/go-kit/kit/log",
+			"Rev": "069a0f8cf7ee45345296db0b153a0b9c7decb6b3"
 		},
 		{
-			"ImportPath": "gopkg.in/unrolled/render.v1",
-			"Rev": "cf57b1afa5d93abdbd356aad95d7c2720dad6d01"
+			"ImportPath": "github.com/go-kit/kit/transport/http",
+			"Rev": "069a0f8cf7ee45345296db0b153a0b9c7decb6b3"
+		},
+		{
+			"ImportPath": "golang.org/x/net/context",
+			"Rev": "01256db42e5106196a3473ec1620727a383500e8"
+		},
+		{
+			"ImportPath": "gopkg.in/logfmt.v0",
+			"Rev": "c50dc9aa845e681529d8e49d3dc11ec0195aacac"
+		},
+		{
+			"ImportPath": "gopkg.in/stack.v1",
+			"Comment": "v1.4.0",
+			"Rev": "0585967eab0016c8e4e2d55ac20585b469574cec"
 		}
 	]
 }
