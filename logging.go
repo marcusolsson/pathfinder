@@ -26,6 +26,3 @@ func (mw loggingMiddleware) ShortestPath(origin, destination string) (paths []pa
 	paths = mw.PathService.ShortestPath(origin, destination)
 	return
 }
-
-type methodMiddleware struct {
-}
