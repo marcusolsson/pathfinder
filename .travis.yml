@@ -17,6 +17,7 @@ deploy:
   provider: heroku
   api_key:
     secure: Ugkze16gV9dZKHZl3uyoVQFEDSEKYQ86/j0SB/OJWsFP2/3kBgBMsxdB/qD1bzMa8zWunRSko/zeM65w2ntl2nGm8C5xY4+nweFm5ZKvt6UITc5Wf1x1eN4MTxwXi+/luIQQTnxfipkLYjIbWT9pyRETtD4Vil7Ezh7vpERZFfU=
+  skip_cleanup: true
   app: ddd-pathfinder
   on:
     repo: marcusolsson/pathfinder
