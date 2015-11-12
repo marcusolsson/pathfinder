@@ -8,12 +8,7 @@ The routing context from the original DDD Sample Application, written in Go.
 
 Pathfinder is accessible as a REST API, currently deployed to Heroku. Try it out here:
 
-[ddd-pathfinder on Heroku](http://ddd-pathfinder.herokuapp.com/paths?from=SESTO&to=CNHKG)
+## REST API
 
-#### GET /paths
-Returns an array of candidate paths for a given route.
-
-| URL Param | Description |
-|:----------|:------------|
-|from=[string]|UN locode of the origin|
-|to=[string]|UN locode of the destination|
+[Example](http://ddd-pathfinder.herokuapp.com/paths?from=SESTO&to=CNHKG)
+[Documentation](http://ddd-pathfinder.herokuapp.com/docs/)
