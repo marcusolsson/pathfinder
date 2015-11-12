@@ -36,6 +36,9 @@ func main() {
 
 	http.Handle("/paths", method("GET", shortestPathHandler))
 
+	http.Handle("/", http.RedirectHandler("/docs/", http.StatusMovedPermanently))
+	http.Handle("/docs/", http.StripPrefix("/docs/", http.FileServer(http.Dir("docs"))))
+
 	_ = logger.Log("msg", "HTTP", "addr", addr)
 	_ = logger.Log("err", http.ListenAndServe(addr, nil))
 }
