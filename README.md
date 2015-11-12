@@ -10,5 +10,5 @@ Pathfinder is accessible as a REST API, currently deployed to Heroku. Try it out
 
 ## REST API
 
-[Example](http://ddd-pathfinder.herokuapp.com/paths?from=SESTO&to=CNHKG)
-[Documentation](http://ddd-pathfinder.herokuapp.com/docs/)
+- [Example](http://ddd-pathfinder.herokuapp.com/paths?from=SESTO&to=CNHKG)
+- [Documentation](http://ddd-pathfinder.herokuapp.com/docs/)
