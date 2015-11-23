@@ -1,0 +1,17 @@
+[Unit]
+Description=Pathfinder Service
+After=docker.service
+Requires=docker.service
+
+[Service]
+EnvironmentFile=/etc/environment
+ExecStartPre=-/usr/bin/docker kill pathfinder-%i
+ExecStartPre=-/usr/bin/docker rm pathfinder-%i
+ExecStartPre=-/usr/bin/docker pull marcusolsson/pathfinder
+ExecStart=/usr/bin/docker run --rm --name pathfinder-%i -p %i:8080 marcusolsson/pathfinder
+ExecStartPost=/usr/bin/etcdctl set /vulcand/backends/pathfinder/servers/srv%i '{"URL": "http://${COREOS_PUBLIC_IPV4}:%i"}'
+ExecStop=/usr/bin/etcdctl rm /vulcand/backends/pathfinder/servers/srv%i
+ExecStop=/usr/bin/docker stop pathfinder-%i
+
+[X-Fleet]
+Conflicts=pathfinder@*.service
