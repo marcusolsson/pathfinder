@@ -19,7 +19,7 @@ go run main.go
 You can also run the application using Docker:
 
 ```
-docker run --rm -it -p 8080:8080 marcusolsson/pathfinder
+docker run -p 8080:8080 marcusolsson/pathfinder
 ```
 
 ## Try it!
