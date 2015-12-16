@@ -6,7 +6,27 @@ pathfinder
 
 The routing context from the original DDD Sample Application, written in Go.
 
-Pathfinder is accessible as a REST API, currently deployed to Heroku. Try it out here:
+## Running the application
+
+Start the application on port 8080 (or whatever the `PORT` variable is set to).
+
+```
+go run main.go
+```
+
+### Docker
+
+You can also run the application using Docker:
+
+```
+docker run --rm -it -p 8080:8080 marcusolsson/pathfinder
+```
+
+## Try it!
+
+```
+curl 'localhost:8080/paths?from=SESTO&to=FIHEL'
+```
 
 ## REST API
 
