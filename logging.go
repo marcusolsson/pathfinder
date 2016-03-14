@@ -15,7 +15,7 @@ type loggingService struct {
 
 func (s loggingService) ShortestPath(origin, destination string) (paths []path.TransitPath, err error) {
 	defer func(begin time.Time) {
-		_ = mw.logger.Log(
+		_ = s.logger.Log(
 			"method", "shortest_path",
 			"origin", origin,
 			"destination", destination,
