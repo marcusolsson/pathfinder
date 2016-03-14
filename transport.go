@@ -4,42 +4,41 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
-
-	"github.com/go-kit/kit/endpoint"
-	"github.com/marcusolsson/pathfinder/path"
-	"golang.org/x/net/context"
 )
 
-type shortestPathRequest struct {
-	From string `json:"from"`
-	To   string `json:"to"`
-}
-
-type shortestPathResponse struct {
-	Paths []path.TransitPath `json:"paths"`
-}
-
-func makeShortestPathEndpoint(ps PathService) endpoint.Endpoint {
-	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		req := request.(shortestPathRequest)
-		paths := ps.ShortestPath(req.From, req.To)
-		return shortestPathResponse{Paths: paths}, nil
-	}
-}
+var errInvalidArgument = errors.New("invalid argument")
 
 func decodeShortestPathRequest(r *http.Request) (interface{}, error) {
 	var (
 		from = r.URL.Query().Get("from")
 		to   = r.URL.Query().Get("to")
 	)
-
-	if from == "" || to == "" {
-		return nil, errors.New("missing parameters")
-	}
-
 	return shortestPathRequest{From: from, To: to}, nil
 }
 
-func encodeResponse(w http.ResponseWriter, resp interface{}) error {
-	return json.NewEncoder(w).Encode(resp)
+func encodeResponse(w http.ResponseWriter, response interface{}) error {
+	if e, ok := response.(errorer); ok && e.error() != nil {
+		encodeError(w, e.error())
+		return nil
+	}
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	return json.NewEncoder(w).Encode(response)
+}
+
+type errorer interface {
+	error() error
+}
+
+// encode errors from business-logic
+func encodeError(w http.ResponseWriter, err error) {
+	switch err {
+	case errInvalidArgument:
+		w.WriteHeader(http.StatusBadRequest)
+	default:
+		w.WriteHeader(http.StatusInternalServerError)
+	}
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"error": err.Error(),
+	})
 }
