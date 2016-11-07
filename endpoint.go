@@ -1,4 +1,4 @@
-package main
+package pathfinder
 
 import (
 	"golang.org/x/net/context"

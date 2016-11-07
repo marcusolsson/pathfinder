@@ -1,14 +1,39 @@
-package main
+package pathfinder
 
 import (
 	"encoding/json"
 	"errors"
 	"net/http"
 
+	"github.com/go-kit/kit/log"
+	httptransport "github.com/go-kit/kit/transport/http"
+	"github.com/gorilla/mux"
+
 	"golang.org/x/net/context"
 )
 
 var errInvalidArgument = errors.New("invalid argument")
+
+func MakeHTTPHandler(ctx context.Context, ps PathService, logger log.Logger) http.Handler {
+	opts := []httptransport.ServerOption{
+		httptransport.ServerErrorLogger(logger),
+		httptransport.ServerErrorEncoder(encodeError),
+	}
+
+	shortestPathHandler := httptransport.NewServer(
+		ctx,
+		makeShortestPathEndpoint(ps),
+		decodeShortestPathRequest,
+		encodeResponse,
+		opts...,
+	)
+
+	r := mux.NewRouter()
+	r.Handle("/paths", shortestPathHandler).Methods("GET")
+	r.Handle("/docs/", http.StripPrefix("/docs/", http.FileServer(http.Dir("docs"))))
+
+	return r
+}
 
 func decodeShortestPathRequest(_ context.Context, r *http.Request) (interface{}, error) {
 	var (

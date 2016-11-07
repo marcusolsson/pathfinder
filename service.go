@@ -1,4 +1,4 @@
-package main
+package pathfinder
 
 import "github.com/marcusolsson/pathfinder/path"
 
@@ -8,6 +8,10 @@ type PathService interface {
 }
 
 type pathService struct{}
+
+func NewPathService() PathService {
+	return pathService{}
+}
 
 func (pathService) ShortestPath(origin, destination string) ([]path.TransitPath, error) {
 	if origin == "" || destination == "" {

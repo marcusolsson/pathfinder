@@ -11,7 +11,7 @@ The routing context from the original DDD Sample Application, written in Go.
 Start the application on port 8080 (or whatever the `PORT` variable is set to).
 
 ```
-go run main.go
+go run cmd/pathfinder/main.go
 ```
 
 ### Docker

@@ -11,9 +11,7 @@ import (
 	"golang.org/x/net/context"
 
 	"github.com/go-kit/kit/log"
-	"github.com/gorilla/mux"
-
-	httptransport "github.com/go-kit/kit/transport/http"
+	"github.com/marcusolsson/pathfinder"
 )
 
 const defaultPort = "8080"
@@ -32,29 +30,12 @@ func main() {
 	logger = log.NewLogfmtLogger(os.Stderr)
 	logger = log.NewContext(logger).With("ts", log.DefaultTimestampUTC)
 
-	var ps PathService
-	ps = pathService{}
-	ps = loggingService{log.NewContext(logger).With("component", "path"), ps}
+	var ps pathfinder.PathService
+	ps = pathfinder.NewPathService()
+	ps = pathfinder.NewLoggingService(log.NewContext(logger).With("component", "path"), ps)
 
 	httpLogger := log.NewContext(logger).With("component", "http")
-
-	opts := []httptransport.ServerOption{
-		httptransport.ServerErrorLogger(httpLogger),
-		httptransport.ServerErrorEncoder(encodeError),
-	}
-
-	shortestPathHandler := httptransport.NewServer(
-		ctx,
-		makeShortestPathEndpoint(ps),
-		decodeShortestPathRequest,
-		encodeResponse,
-		opts...,
-	)
-
-	r := mux.NewRouter()
-	r.Handle("/paths", shortestPathHandler).Methods("GET")
-	r.Handle("/docs/", http.StripPrefix("/docs/", http.FileServer(http.Dir("docs"))))
-	http.Handle("/", r)
+	http.Handle("/", pathfinder.MakeHTTPHandler(ctx, ps, httpLogger))
 
 	errs := make(chan error, 2)
 	go func() {

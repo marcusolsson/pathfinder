@@ -1,4 +1,4 @@
-package main
+package pathfinder
 
 import (
 	"time"
@@ -11,6 +11,13 @@ import (
 type loggingService struct {
 	logger log.Logger
 	PathService
+}
+
+func NewLoggingService(logger log.Logger, ps PathService) PathService {
+	return loggingService{
+		logger:      logger,
+		PathService: ps,
+	}
 }
 
 func (s loggingService) ShortestPath(origin, destination string) (paths []path.TransitPath, err error) {
