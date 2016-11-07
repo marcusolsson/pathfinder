@@ -7,10 +7,11 @@ import (
 	"testing"
 
 	"github.com/go-kit/kit/log"
-	"gopkg.in/logfmt.v0"
+	"github.com/go-logfmt/logfmt"
 )
 
 func TestLogfmtLogger(t *testing.T) {
+	t.Parallel()
 	buf := &bytes.Buffer{}
 	logger := log.NewLogfmtLogger(buf)
 
@@ -47,7 +48,8 @@ func BenchmarkLogfmtLoggerContextual(b *testing.B) {
 }
 
 func TestLogfmtLoggerConcurrency(t *testing.T) {
-	testConcurrency(t, log.NewLogfmtLogger(ioutil.Discard))
+	t.Parallel()
+	testConcurrency(t, log.NewLogfmtLogger(ioutil.Discard), 10000)
 }
 
 type mymap map[int]int

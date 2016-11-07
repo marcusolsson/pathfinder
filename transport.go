@@ -4,11 +4,13 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+
+	"golang.org/x/net/context"
 )
 
 var errInvalidArgument = errors.New("invalid argument")
 
-func decodeShortestPathRequest(r *http.Request) (interface{}, error) {
+func decodeShortestPathRequest(_ context.Context, r *http.Request) (interface{}, error) {
 	var (
 		from = r.URL.Query().Get("from")
 		to   = r.URL.Query().Get("to")
@@ -16,9 +18,9 @@ func decodeShortestPathRequest(r *http.Request) (interface{}, error) {
 	return shortestPathRequest{From: from, To: to}, nil
 }
 
-func encodeResponse(w http.ResponseWriter, response interface{}) error {
+func encodeResponse(ctx context.Context, w http.ResponseWriter, response interface{}) error {
 	if e, ok := response.(errorer); ok && e.error() != nil {
-		encodeError(w, e.error())
+		encodeError(ctx, e.error(), w)
 		return nil
 	}
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
@@ -30,7 +32,7 @@ type errorer interface {
 }
 
 // encode errors from business-logic
-func encodeError(w http.ResponseWriter, err error) {
+func encodeError(_ context.Context, err error, w http.ResponseWriter) {
 	switch err {
 	case errInvalidArgument:
 		w.WriteHeader(http.StatusBadRequest)

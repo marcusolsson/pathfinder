@@ -1,8 +1,9 @@
 package main
 
 import (
-	"github.com/go-kit/kit/endpoint"
 	"golang.org/x/net/context"
+
+	"github.com/go-kit/kit/endpoint"
 
 	"github.com/marcusolsson/pathfinder/path"
 )

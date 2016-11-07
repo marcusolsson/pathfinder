@@ -1,35 +1,55 @@
+// Package thrift provides a Thrift client for the add service.
 package thrift
 
 import (
-	"github.com/go-kit/kit/examples/addsvc/server"
-	thriftadd "github.com/go-kit/kit/examples/addsvc/thrift/gen-go/add"
-	"github.com/go-kit/kit/log"
+	"time"
+
+	jujuratelimit "github.com/juju/ratelimit"
+	"github.com/sony/gobreaker"
+
+	"github.com/go-kit/kit/circuitbreaker"
+	"github.com/go-kit/kit/endpoint"
+	"github.com/go-kit/kit/examples/addsvc"
+	thriftadd "github.com/go-kit/kit/examples/addsvc/thrift/gen-go/addsvc"
+	"github.com/go-kit/kit/ratelimit"
 )
 
-// New returns an AddService that's backed by the Thrift client.
-func New(cli *thriftadd.AddServiceClient, logger log.Logger) server.AddService {
-	return &client{cli, logger}
-}
+// New returns an AddService backed by a Thrift server described by the provided
+// client. The caller is responsible for constructing the client, and eventually
+// closing the underlying transport.
+func New(client *thriftadd.AddServiceClient) addsvc.Service {
+	// We construct a single ratelimiter middleware, to limit the total outgoing
+	// QPS from this client to all methods on the remote instance. We also
+	// construct per-endpoint circuitbreaker middlewares to demonstrate how
+	// that's done, although they could easily be combined into a single breaker
+	// for the entire remote instance, too.
 
-type client struct {
-	*thriftadd.AddServiceClient
-	log.Logger
-}
+	limiter := ratelimit.NewTokenBucketLimiter(jujuratelimit.NewBucketWithRate(100, 100))
 
-func (c client) Sum(a, b int) int {
-	reply, err := c.AddServiceClient.Sum(int64(a), int64(b))
-	if err != nil {
-		c.Logger.Log("err", err)
-		return 0
+	// Thrift does not currently have tracer bindings, so we skip tracing.
+
+	var sumEndpoint endpoint.Endpoint
+	{
+		sumEndpoint = addsvc.MakeThriftSumEndpoint(client)
+		sumEndpoint = limiter(sumEndpoint)
+		sumEndpoint = circuitbreaker.Gobreaker(gobreaker.NewCircuitBreaker(gobreaker.Settings{
+			Name:    "Sum",
+			Timeout: 30 * time.Second,
+		}))(sumEndpoint)
 	}
-	return int(reply.Value)
-}
 
-func (c client) Concat(a, b string) string {
-	reply, err := c.AddServiceClient.Concat(a, b)
-	if err != nil {
-		c.Logger.Log("err", err)
-		return ""
+	var concatEndpoint endpoint.Endpoint
+	{
+		concatEndpoint = addsvc.MakeThriftConcatEndpoint(client)
+		concatEndpoint = limiter(concatEndpoint)
+		concatEndpoint = circuitbreaker.Gobreaker(gobreaker.NewCircuitBreaker(gobreaker.Settings{
+			Name:    "Concat",
+			Timeout: 30 * time.Second,
+		}))(concatEndpoint)
 	}
-	return reply.Value
+
+	return addsvc.Endpoints{
+		SumEndpoint:    sumEndpoint,
+		ConcatEndpoint: concatEndpoint,
+	}
 }

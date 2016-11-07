@@ -10,6 +10,10 @@ import (
 // It represents a single RPC method.
 type Endpoint func(ctx context.Context, request interface{}) (response interface{}, err error)
 
+// Nop is an endpoint that does nothing and returns a nil error.
+// Useful for tests.
+func Nop(context.Context, interface{}) (interface{}, error) { return struct{}{}, nil }
+
 // Middleware is a chainable behavior modifier for endpoints.
 type Middleware func(Endpoint) Endpoint
 
@@ -17,7 +21,7 @@ type Middleware func(Endpoint) Endpoint
 // received from an endpoint.
 var ErrBadCast = errors.New("bad cast")
 
-// ContextCanceled indicates the request context was canceled.
+// ErrContextCanceled indicates the request context was canceled.
 var ErrContextCanceled = errors.New("context canceled")
 
 // Chain is a helper function for composing middlewares. Requests will

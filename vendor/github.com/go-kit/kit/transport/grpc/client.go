@@ -2,6 +2,8 @@ package grpc
 
 import (
 	"fmt"
+	"reflect"
+	"strings"
 
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
@@ -18,11 +20,13 @@ type Client struct {
 	method      string
 	enc         EncodeRequestFunc
 	dec         DecodeResponseFunc
-	grpcReply   interface{}
+	grpcReply   reflect.Type
 	before      []RequestFunc
 }
 
 // NewClient constructs a usable Client for a single remote endpoint.
+// Pass an zero-value protobuf message of the RPC response type as
+// the grpcReply argument.
 func NewClient(
 	cc *grpc.ClientConn,
 	serviceName string,
@@ -32,13 +36,24 @@ func NewClient(
 	grpcReply interface{},
 	options ...ClientOption,
 ) *Client {
+	if strings.IndexByte(serviceName, '.') == -1 {
+		serviceName = "pb." + serviceName
+	}
 	c := &Client{
-		client:    cc,
-		method:    fmt.Sprintf("/pb.%s/%s", serviceName, method),
-		enc:       enc,
-		dec:       dec,
-		grpcReply: grpcReply,
-		before:    []RequestFunc{},
+		client: cc,
+		method: fmt.Sprintf("/%s/%s", serviceName, method),
+		enc:    enc,
+		dec:    dec,
+		// We are using reflect.Indirect here to allow both reply structs and
+		// pointers to these reply structs. New consumers of the client should
+		// use structs directly, while existing consumers will not break if they
+		// remain to use pointers to structs.
+		grpcReply: reflect.TypeOf(
+			reflect.Indirect(
+				reflect.ValueOf(grpcReply),
+			).Interface(),
+		),
+		before: []RequestFunc{},
 	}
 	for _, option := range options {
 		option(c)
@@ -49,9 +64,9 @@ func NewClient(
 // ClientOption sets an optional parameter for clients.
 type ClientOption func(*Client)
 
-// SetClientBefore sets the RequestFuncs that are applied to the outgoing gRPC
+// ClientBefore sets the RequestFuncs that are applied to the outgoing gRPC
 // request before it's invoked.
-func SetClientBefore(before ...RequestFunc) ClientOption {
+func ClientBefore(before ...RequestFunc) ClientOption {
 	return func(c *Client) { c.before = before }
 }
 
@@ -73,11 +88,12 @@ func (c Client) Endpoint() endpoint.Endpoint {
 		}
 		ctx = metadata.NewContext(ctx, *md)
 
-		if err = grpc.Invoke(ctx, c.method, req, c.grpcReply, c.client); err != nil {
+		grpcReply := reflect.New(c.grpcReply).Interface()
+		if err = grpc.Invoke(ctx, c.method, req, grpcReply, c.client); err != nil {
 			return nil, fmt.Errorf("Invoke: %v", err)
 		}
 
-		response, err := c.dec(ctx, c.grpcReply)
+		response, err := c.dec(ctx, grpcReply)
 		if err != nil {
 			return nil, fmt.Errorf("Decode: %v", err)
 		}
