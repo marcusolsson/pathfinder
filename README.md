@@ -27,8 +27,3 @@ docker run --name some-pathfinder -p 8080:8080 marcusolsson/pathfinder
 ```
 curl 'localhost:8080/paths?from=SESTO&to=FIHEL'
 ```
-
-## REST API
-
-- [Example](http://pathfinder.marcusoncode.se/paths?from=SESTO&to=CNHKG)
-- [Documentation](http://pathfinder.marcusoncode.se/docs/)
