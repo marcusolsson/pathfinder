@@ -9,7 +9,7 @@ services:
   - docker
 
 install:
-  - docker login -e $DOCKER_EMAIL -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+  - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
 
 script:
   - go test -race -v $(go list ./... | grep -v /vendor/)
