@@ -14,7 +14,7 @@ import (
 
 var errInvalidArgument = errors.New("invalid argument")
 
-func MakeHTTPHandler(ctx context.Context, ps PathService, logger log.Logger) http.Handler {
+func MakeHTTPHandler(ps PathService, logger log.Logger) http.Handler {
 	opts := []httptransport.ServerOption{
 		httptransport.ServerErrorLogger(logger),
 		httptransport.ServerErrorEncoder(encodeError),
@@ -29,7 +29,7 @@ func MakeHTTPHandler(ctx context.Context, ps PathService, logger log.Logger) htt
 
 	r := mux.NewRouter()
 	r.Handle("/paths", shortestPathHandler).Methods("GET")
-	r.Handle("/docs/", http.StripPrefix("/docs/", http.FileServer(http.Dir("docs"))))
+	r.Handle("/docs/", http.StripPrefix("/docs/", http.FileServer(http.Dir("api"))))
 
 	return r
 }
