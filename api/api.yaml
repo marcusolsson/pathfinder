@@ -6,7 +6,7 @@ info:
     name: MIT
     url: https://github.com/marcusolsson/pathfinder/blob/master/LICENSE
 paths:
-  /:
+  /paths:
     get:
       summary: Generates random paths between two locations.
       parameters:
