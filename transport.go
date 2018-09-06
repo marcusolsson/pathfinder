@@ -21,7 +21,6 @@ func MakeHTTPHandler(ctx context.Context, ps PathService, logger log.Logger) htt
 	}
 
 	shortestPathHandler := httptransport.NewServer(
-		ctx,
 		makeShortestPathEndpoint(ps),
 		decodeShortestPathRequest,
 		encodeResponse,

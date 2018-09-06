@@ -28,13 +28,13 @@ func main() {
 
 	var logger log.Logger
 	logger = log.NewLogfmtLogger(os.Stderr)
-	logger = log.NewContext(logger).With("ts", log.DefaultTimestampUTC)
+	logger = log.With(logger, "ts", log.DefaultTimestampUTC)
 
 	var ps pathfinder.PathService
 	ps = pathfinder.NewPathService()
-	ps = pathfinder.NewLoggingService(log.NewContext(logger).With("component", "path"), ps)
+	ps = pathfinder.NewLoggingService(log.With(logger, "component", "path"), ps)
 
-	httpLogger := log.NewContext(logger).With("component", "http")
+	httpLogger := log.With(logger, "component", "http")
 	http.Handle("/", pathfinder.MakeHTTPHandler(ctx, ps, httpLogger))
 
 	errs := make(chan error, 2)
