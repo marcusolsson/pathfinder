@@ -1,14 +1,12 @@
-# build stage
-FROM billyteves/alpine-golang-glide:latest AS build-env
+FROM golang:1.10.3-alpine AS build-env
 ADD . /go/src/github.com/marcusolsson/pathfinder
-RUN cd /go/src/github.com/marcusolsson/pathfinder && glide install
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o pathfinder .
+WORKDIR /go/src/github.com/marcusolsson/pathfinder
+RUN GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -a -installsuffix cgo -o goapp ./cmd/pathfinder/main.go
 
-# final stage
-FROM alpine
+FROM alpine:3.7
 WORKDIR /app
-COPY --from=build-env /go/src/github.com/marcusolsson/pathfinder/pathfinder /app/
+COPY --from=build-env /go/src/github.com/marcusolsson/pathfinder/goapp /app/
 ADD docs /docs
 EXPOSE 8080
-CMD ["/app/pathfinder"]
+CMD ["./goapp"]
 

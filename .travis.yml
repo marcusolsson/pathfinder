@@ -1,26 +1,27 @@
-language: go
-
-go: 
-  - 1.8
-
 sudo: required
 
-services: 
+language: go
+go:
+  - 1.10.x
+  - 1.11.x
+
+services:
   - docker
 
-install:
-  - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+env:
+  - GO111MODULE=on
 
-script:
-  - go test -race -v $(go list ./... | grep -v /vendor/)
-  - CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o pathfinder .
+install:
+  - go get -u github.com/golang/lint/golint
+
+matrix:
+  include:
+  - go: "1.10.x"
+    script:  go test -v ./...
+  - go: "1.11.x"
+    script: go test -v -mod=vendor ./...
 
 after_success:
+  - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
   - docker build -t $DOCKER_IMAGE_NAME .
-  - if [ ! -z "$TRAVIS_TAG" ]; then docker tag $DOCKER_IMAGE_NAME:latest $DOCKER_IMAGE_NAME:$TRAVIS_TAG; fi && docker push $DOCKER_IMAGE_NAME 
   - docker push $DOCKER_IMAGE_NAME
-
-addons:
-   apt:
-     packages:
-       - docker-ce
