@@ -12,6 +12,7 @@ import (
 
 	"github.com/go-kit/kit/log"
 	"github.com/marcusolsson/pathfinder"
+	"github.com/marcusolsson/pathfinder/server"
 )
 
 const defaultPort = "8080"
@@ -28,8 +29,10 @@ func main() {
 	logger = log.With(logger, "ts", log.DefaultTimestampUTC)
 
 	var ps pathfinder.PathService
-	ps = pathfinder.NewPathService()
-	ps = pathfinder.NewLoggingService(log.With(logger, "component", "path"), ps)
+	{
+		ps = pathfinder.NewPathService()
+		ps = pathfinder.NewLoggingService(log.With(logger, "component", "path"), ps)
+	}
 
 	httpLogger := log.With(logger, "component", "http")
 
@@ -37,9 +40,11 @@ func main() {
 
 	signal.Notify(stop, syscall.SIGINT, syscall.SIGTERM)
 
+	srv := server.New(ps, httpLogger)
+
 	h := http.Server{
 		Addr:    *httpAddr,
-		Handler: pathfinder.MakeHTTPHandler(ps, httpLogger),
+		Handler: srv,
 	}
 
 	go func() {

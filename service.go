@@ -1,6 +1,12 @@
 package pathfinder
 
-import "github.com/marcusolsson/pathfinder/path"
+import (
+	"errors"
+
+	"github.com/marcusolsson/pathfinder/path"
+)
+
+var ErrInvalidArgument = errors.New("invalid argument")
 
 // PathService provides the shortest path "algoritm".
 type PathService interface {
@@ -15,7 +21,7 @@ func NewPathService() PathService {
 
 func (pathService) ShortestPath(origin, destination string) ([]path.TransitPath, error) {
 	if origin == "" || destination == "" {
-		return nil, errInvalidArgument
+		return nil, ErrInvalidArgument
 	}
 	return path.FindShortestPath(origin, destination), nil
 }
