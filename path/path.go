@@ -26,7 +26,6 @@ type TransitPath struct {
 
 // FindShortestPath computes the shortest paths between two locations.
 func FindShortestPath(origin, destination string) []TransitPath {
-
 	var candidates []TransitPath
 
 	for p := range generateCandidates(origin, destination, 3+rand.Intn(3)) {
