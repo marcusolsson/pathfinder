@@ -11,10 +11,8 @@ import (
 
 // Server holds the dependencies for a HTTP server.
 type Server struct {
-	Paths pathfinder.PathService
-
+	Paths  pathfinder.PathService
 	Logger log.Logger
-
 	router chi.Router
 }
 

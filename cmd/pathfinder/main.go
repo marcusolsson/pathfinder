@@ -31,7 +31,7 @@ func main() {
 	var ps pathfinder.PathService
 	{
 		ps = pathfinder.NewPathService()
-		ps = pathfinder.NewLoggingService(log.With(logger, "component", "path"), ps)
+		ps = pathfinder.NewLoggingMiddleware(log.With(logger, "component", "path"), ps)
 	}
 
 	httpLogger := log.With(logger, "component", "http")

@@ -8,19 +8,20 @@ import (
 	"github.com/marcusolsson/pathfinder/path"
 )
 
-type loggingService struct {
+type loggingMiddleware struct {
 	logger log.Logger
-	PathService
+	next   PathService
 }
 
-func NewLoggingService(logger log.Logger, ps PathService) PathService {
-	return loggingService{
-		logger:      logger,
-		PathService: ps,
+// NewLoggingMiddleware creates a new logging middleware.
+func NewLoggingMiddleware(logger log.Logger, next PathService) PathService {
+	return &loggingMiddleware{
+		logger: logger,
+		next:   next,
 	}
 }
 
-func (s loggingService) ShortestPath(origin, destination string) (paths []path.TransitPath, err error) {
+func (s *loggingMiddleware) ShortestPath(origin, destination string) (paths []path.TransitPath, err error) {
 	defer func(begin time.Time) {
 		_ = s.logger.Log(
 			"method", "shortest_path",
@@ -30,5 +31,5 @@ func (s loggingService) ShortestPath(origin, destination string) (paths []path.T
 			"err", err,
 		)
 	}(time.Now())
-	return s.PathService.ShortestPath(origin, destination)
+	return s.next.ShortestPath(origin, destination)
 }
